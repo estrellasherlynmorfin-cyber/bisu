@@ -1,0 +1,289 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  #app { font-family: 'DM Sans', sans-serif; background: #1a0a00; min-height: 680px; width: 100%; display: flex; justify-content: center; }
+  .phone { width: 360px; min-height: 680px; background: #fdf8f2; display: flex; flex-direction: column; }
+  .screen { display: none; flex-direction: column; flex: 1; }
+  .screen.active { display: flex; }
+
+  #screen-welcome { background: linear-gradient(170deg,#1a0a00 0%,#3d1a00 50%,#6b2f00 100%); align-items: center; justify-content: center; padding: 60px 32px 40px; }
+  .logo-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 48px; }
+  .logo-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #f5c842; letter-spacing: 3px; text-transform: uppercase; }
+  .logo-sub { font-size: 11px; color: #c9955a; letter-spacing: 4px; text-transform: uppercase; margin-top: 4px; }
+  .welcome-divider { width: 60px; height: 1px; background: #c9955a; margin: 0 auto 40px; }
+  .welcome-tagline { color: #e8d5b0; font-size: 14px; text-align: center; line-height: 1.7; margin-bottom: 48px; }
+  .btn-primary { width: 100%; padding: 15px; border: none; border-radius: 50px; background: #f5c842; color: #1a0a00; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; letter-spacing: 1px; cursor: pointer; margin-bottom: 12px; transition: opacity 0.2s; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-outline { width: 100%; padding: 14px; border: 1.5px solid #f5c842; border-radius: 50px; background: transparent; color: #f5c842; font-family: 'DM Sans', sans-serif; font-size: 15px; cursor: pointer; letter-spacing: 1px; transition: background 0.2s; }
+  .btn-outline:hover { background: rgba(245,200,66,0.1); }
+
+  #screen-login, #screen-register { background: #fdf8f2; }
+  .form-header { background: linear-gradient(140deg,#1a0a00,#6b2f00); padding: 40px 28px 32px; position: relative; }
+  .back-btn { position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.15); border: none; color: #f5c842; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .form-header-gem { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .form-header h2 { font-family: 'Playfair Display', serif; font-size: 24px; color: #f5c842; font-weight: 600; }
+  .form-header p { color: #c9955a; font-size: 13px; }
+  .form-body { padding: 28px 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; overflow-y: auto; }
+  .field-group label { display: block; font-size: 12px; font-weight: 500; color: #6b2f00; letter-spacing: 0.5px; margin-bottom: 6px; text-transform: uppercase; }
+  .field-group input { width: 100%; padding: 13px 16px; border: 1.5px solid #e8d5b0; border-radius: 12px; background: #fff; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #1a0a00; outline: none; transition: border-color 0.2s; }
+  .field-group input:focus { border-color: #f5c842; }
+  .field-group input.error { border-color: #e24b4a; }
+  .error-msg { font-size: 12px; color: #e24b4a; margin-top: 4px; display: none; }
+  .error-msg.show { display: block; }
+  .submit-btn { width: 100%; padding: 15px; background: #1a0a00; color: #f5c842; border: none; border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 8px; letter-spacing: 0.5px; transition: background 0.2s, opacity 0.2s; }
+  .submit-btn:hover { background: #3d1a00; }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .success-toast { background: #eaf3de; border: 1px solid #639922; color: #3B6D11; border-radius: 10px; padding: 10px 14px; font-size: 13px; display: none; }
+  .success-toast.show { display: block; }
+
+  .loading-overlay { position: absolute; inset: 0; background: rgba(253,248,242,0.85); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; z-index: 10; border-radius: 4px; }
+  .spinner { width: 28px; height: 28px; border: 3px solid #e8d5b0; border-top-color: #6b2f00; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { font-size: 13px; color: #6b2f00; }
+
+  #screen-home { background: #fdf8f2; }
+  .home-topbar { background: linear-gradient(130deg,#1a0a00,#5a2200); padding: 20px 20px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .home-logo-text { font-family: 'Playfair Display', serif; color: #f5c842; font-size: 18px; font-weight: 700; letter-spacing: 2px; }
+  .home-user { display: flex; align-items: center; gap: 8px; color: #c9955a; font-size: 13px; }
+  .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #f5c842; color: #1a0a00; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; }
+  .home-banner { margin: 20px 16px; background: linear-gradient(120deg,#3d1a00,#6b2f00); border-radius: 16px; padding: 20px; }
+  .home-banner h3 { font-family: 'Playfair Display', serif; color: #f5c842; font-size: 18px; margin-bottom: 6px; }
+  .home-banner p { color: #e8d5b0; font-size: 13px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 16px; color: #1a0a00; padding: 4px 16px 10px; font-weight: 600; }
+  .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px 16px; }
+  .product-card { background: #fff; border-radius: 14px; border: 1px solid #e8d5b0; overflow: hidden; }
+  .product-img { width: 100%; height: 110px; display: flex; align-items: center; justify-content: center; font-size: 38px; background: #f9f0e3; }
+  .product-info { padding: 10px 12px 12px; }
+  .product-name { font-size: 13px; font-weight: 500; color: #1a0a00; margin-bottom: 2px; }
+  .product-price { font-size: 14px; font-weight: 500; color: #6b2f00; font-family: 'Playfair Display', serif; }
+  .logout-btn { margin: 0 16px 24px; width: calc(100% - 32px); padding: 12px; background: transparent; border: 1.5px solid #e8d5b0; border-radius: 50px; color: #888; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; }
+  .logout-btn:hover { border-color: #c9955a; color: #6b2f00; }
+  .firebase-badge { text-align: center; font-size: 11px; color: #c9955a; padding-bottom: 8px; letter-spacing: 0.5px; }
+</style>
+
+<div id="app">
+  <div class="phone">
+
+    <!-- WELCOME -->
+    <div id="screen-welcome" class="screen active">
+      <div class="logo-wrap">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="margin-bottom:16px">
+          <polygon points="36,6 62,20 62,52 36,66 10,52 10,20" fill="#f5c842" opacity="0.9"/>
+          <polygon points="36,6 62,20 36,32" fill="#fae07a"/>
+          <polygon points="36,32 62,20 62,52" fill="#c9933a"/>
+          <polygon points="36,32 62,52 36,66" fill="#f5c842"/>
+          <polygon points="36,32 36,66 10,52" fill="#e0a832"/>
+          <polygon points="36,32 10,52 10,20" fill="#c9933a"/>
+          <polygon points="36,32 10,20 36,6" fill="#fae07a"/>
+        </svg>
+        <div class="logo-title">BISULIMON</div>
+        <div class="logo-sub">Joyería &amp; Bisutería</div>
+      </div>
+      <div class="welcome-divider"></div>
+      <p class="welcome-tagline">Descubre piezas únicas que<br>expresan tu esencia.</p>
+      <button class="btn-primary" onclick="showScreen('login')">ACCEDER</button>
+      <button class="btn-outline" onclick="showScreen('register')">CREAR CUENTA</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="screen-login" class="screen">
+      <div class="form-header">
+        <button class="back-btn" onclick="showScreen('welcome')">←</button>
+        <div class="form-header-gem">
+          <svg width="20" height="20" viewBox="0 0 20 20"><polygon points="10,2 18,6 18,14 10,18 2,14 2,6" fill="#f5c842"/></svg>
+          <h2>Bienvenida</h2>
+        </div>
+        <p>Ingresa a tu cuenta BISULIMON</p>
+      </div>
+      <div class="form-body" style="position:relative">
+        <div class="field-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="login-email" placeholder="tucorreo@ejemplo.com"/>
+        </div>
+        <div class="field-group">
+          <label>Contraseña</label>
+          <input type="password" id="login-pass" placeholder="••••••••"/>
+        </div>
+        <div class="error-msg" id="login-err">Correo o contraseña incorrectos</div>
+        <div class="success-toast" id="login-ok">¡Bienvenida de vuelta! 🎉</div>
+        <button class="submit-btn" id="login-btn" onclick="doLogin()">ENTRAR</button>
+        <div class="loading-overlay" id="login-loading" style="display:none">
+          <div class="spinner"></div>
+          <p>Verificando...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="screen-register" class="screen">
+      <div class="form-header">
+        <button class="back-btn" onclick="showScreen('welcome')">←</button>
+        <div class="form-header-gem">
+          <svg width="20" height="20" viewBox="0 0 20 20"><polygon points="10,2 18,6 18,14 10,18 2,14 2,6" fill="#f5c842"/></svg>
+          <h2>Crear cuenta</h2>
+        </div>
+        <p>Únete a la familia BISULIMON</p>
+      </div>
+      <div class="form-body" style="position:relative">
+        <div class="field-group">
+          <label>Nombre de usuario</label>
+          <input type="text" id="reg-name" placeholder="Tu nombre"/>
+          <div class="error-msg" id="reg-name-err">El nombre es requerido</div>
+        </div>
+        <div class="field-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="reg-email" placeholder="tucorreo@ejemplo.com"/>
+          <div class="error-msg" id="reg-email-err">Ingresa un correo válido</div>
+        </div>
+        <div class="field-group">
+          <label>Contraseña</label>
+          <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres"/>
+          <div class="error-msg" id="reg-pass-err">Mínimo 6 caracteres</div>
+        </div>
+        <div class="field-group">
+          <label>Confirmar contraseña</label>
+          <input type="password" id="reg-pass2" placeholder="Repite tu contraseña"/>
+          <div class="error-msg" id="reg-pass2-err">Las contraseñas no coinciden</div>
+        </div>
+        <div class="error-msg" id="reg-dup-err" style="font-size:13px">Este correo ya está registrado</div>
+        <div class="success-toast" id="reg-ok">¡Cuenta creada exitosamente! ✨</div>
+        <button class="submit-btn" id="reg-btn" onclick="doRegister()">CREAR CUENTA</button>
+        <div class="loading-overlay" id="reg-loading" style="display:none">
+          <div class="spinner"></div>
+          <p>Creando cuenta...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div id="screen-home" class="screen">
+      <div class="home-topbar">
+        <span class="home-logo-text">BISULIMON</span>
+        <div class="home-user">
+          <span id="home-greeting" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Hola</span>
+          <div class="user-avatar" id="home-avatar">U</div>
+        </div>
+      </div>
+      <div class="home-banner">
+        <h3>✨ Nueva colección</h3>
+        <p>Aretes, collares y pulseras artesanales</p>
+      </div>
+      <p class="section-title">Destacados</p>
+      <div class="products-grid">
+        <div class="product-card"><div class="product-img">💎</div><div class="product-info"><div class="product-name">Collar Cristal</div><div class="product-price">$120</div></div></div>
+        <div class="product-card"><div class="product-img">📿</div><div class="product-info"><div class="product-name">Pulsera Boho</div><div class="product-price">$85</div></div></div>
+        <div class="product-card"><div class="product-img">✨</div><div class="product-info"><div class="product-name">Aretes Dorados</div><div class="product-price">$95</div></div></div>
+        <div class="product-card"><div class="product-img">💍</div><div class="product-info"><div class="product-name">Anillo Luna</div><div class="product-price">$110</div></div></div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+      <p class="firebase-badge">🔥 Datos guardados en Firebase</p>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getDatabase, ref, set, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyARpZJm8eJtvdZOIKwIhecsFVPhoWMvn1I",
+    authDomain: "bisulimon.firebaseapp.com",
+    databaseURL: "https://bisulimon-default-rtdb.firebaseio.com",
+    projectId: "bisulimon",
+    storageBucket: "bisulimon.firebasestorage.app",
+    messagingSenderId: "905366460885",
+    appId: "1:905366460885:web:6e410a3b95393bfd89455c",
+    measurementId: "G-CGE7P7VPBP"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  window.showScreen = function(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('.success-toast').forEach(t => t.classList.remove('show'));
+    document.querySelectorAll('input').forEach(i => i.classList.remove('error'));
+  };
+
+  function setLoading(screen, on) {
+    document.getElementById(screen + '-loading').style.display = on ? 'flex' : 'none';
+    document.getElementById(screen + '-btn').disabled = on;
+  }
+
+  function goHome(user, displayName) {
+    const name = displayName || user.displayName || user.email.split('@')[0];
+    document.getElementById('home-avatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('home-greeting').textContent = 'Hola, ' + name.split(' ')[0];
+    window.showScreen('home');
+  }
+
+  window.doLogin = async function() {
+    document.getElementById('login-err').classList.remove('show');
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    if (!email || !pass) {
+      document.getElementById('login-err').textContent = 'Completa todos los campos';
+      document.getElementById('login-err').classList.add('show');
+      return;
+    }
+    setLoading('login', true);
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+      document.getElementById('login-ok').classList.add('show');
+      setTimeout(() => goHome(cred.user), 900);
+    } catch(e) {
+      let msg = 'Correo o contraseña incorrectos';
+      if (e.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Espera un momento.';
+      document.getElementById('login-err').textContent = msg;
+      document.getElementById('login-err').classList.add('show');
+    } finally {
+      setLoading('login', false);
+    }
+  };
+
+  window.doRegister = async function() {
+    document.querySelectorAll('#screen-register .error-msg').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('#screen-register input').forEach(i => i.classList.remove('error'));
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pass = document.getElementById('reg-pass').value;
+    const pass2 = document.getElementById('reg-pass2').value;
+    let valid = true;
+    if (!name) { document.getElementById('reg-name-err').classList.add('show'); document.getElementById('reg-name').classList.add('error'); valid = false; }
+    if (!email || !email.includes('@')) { document.getElementById('reg-email-err').classList.add('show'); document.getElementById('reg-email').classList.add('error'); valid = false; }
+    if (pass.length < 6) { document.getElementById('reg-pass-err').classList.add('show'); document.getElementById('reg-pass').classList.add('error'); valid = false; }
+    if (pass !== pass2) { document.getElementById('reg-pass2-err').classList.add('show'); document.getElementById('reg-pass2').classList.add('error'); valid = false; }
+    if (!valid) return;
+
+    setLoading('reg', true);
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+      await set(ref(db, 'usuarios/' + cred.user.uid), {
+        nombre: name,
+        correo: email,
+        uid: cred.user.uid,
+        creadoEn: serverTimestamp()
+      });
+      document.getElementById('reg-ok').classList.add('show');
+      setTimeout(() => goHome(cred.user, name), 1000);
+    } catch(e) {
+      let msg = 'Error al crear la cuenta';
+      if (e.code === 'auth/email-already-in-use') { msg = 'Este correo ya está registrado'; document.getElementById('reg-dup-err').textContent = msg; document.getElementById('reg-dup-err').classList.add('show'); document.getElementById('reg-email').classList.add('error'); }
+      else { document.getElementById('reg-dup-err').textContent = msg; document.getElementById('reg-dup-err').classList.add('show'); }
+    } finally {
+      setLoading('reg', false);
+    }
+  };
+
+  window.doLogout = async function() {
+    await signOut(auth);
+    window.showScreen('welcome');
+  };
+</script>
